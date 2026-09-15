@@ -32,8 +32,8 @@ export default function App() {
   const [receivedFiles, setReceivedFiles] = useState([]);
 
   const [settings, setSettings] = useState({
-    chunkSize: 65536,
-    windowSize: 64,
+    chunkSize: 131072,
+    windowSize: 128,
     retryLimit: 10,
     lossRate: 0.001,
   });
@@ -80,11 +80,11 @@ export default function App() {
     setActiveTab("active");
 
     const senderTransport = new SimulationTransport({
-      latencyMs: 2,
+      latencyMs: 0.1,
       lossRate: settings.lossRate,
     });
     const receiverTransport = new SimulationTransport({
-      latencyMs: 2,
+      latencyMs: 0.1,
       lossRate: settings.lossRate,
     });
     senderTransport.pair(receiverTransport);

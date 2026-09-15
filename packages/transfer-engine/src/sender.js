@@ -13,8 +13,8 @@ export class FileSender extends TypedEventEmitter {
     super();
     this.transport = transport;
     this.options = {
-      chunkSize: options.chunkSize || 64 * 1024,
-      windowSize: options.windowSize || 64,
+      chunkSize: options.chunkSize || 128 * 1024,
+      windowSize: options.windowSize || 128,
       ackTimeoutMs: options.ackTimeoutMs || 500,
       retryLimit: options.retryLimit || 50,
       senderId: options.senderId || 'OPT-NODE-SENDER-01',
@@ -283,7 +283,7 @@ export class FileSender extends TypedEventEmitter {
     };
 
     while (this.unackedPackets.size >= this.options.windowSize || this.receiverWindow === 0) {
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise(resolve => queueMicrotask(resolve));
       this._checkAckTimeouts();
       if (this.state === TransferState.CANCELLED || this.state === TransferState.FAILED) {
         return;

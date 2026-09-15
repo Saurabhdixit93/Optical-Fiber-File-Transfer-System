@@ -79,13 +79,22 @@ export class SimulationTransport extends BaseTransport {
     // Calculate bandwidth delay if configured
     const bits = sendBuffer.length * 8;
     const sendTimeMs = (bits / (this.options.bandwidthMbps * 1_000_000)) * 1000;
-    const totalDelayMs = this.options.latencyMs + Math.round(sendTimeMs);
+    const totalDelayMs = (this.options.latencyMs || 0) + sendTimeMs;
 
-    setTimeout(() => {
-      if (this.peer && this.peer.status === LinkStatus.ACTIVE) {
-        this.peer._receiveData(sendBuffer);
-      }
-    }, totalDelayMs);
+    if (totalDelayMs < 3) {
+      // Direct optical sub-ms propagation - use microtask to bypass browser 15ms setTimeout throttling
+      queueMicrotask(() => {
+        if (this.peer && this.peer.status === LinkStatus.ACTIVE) {
+          this.peer._receiveData(sendBuffer);
+        }
+      });
+    } else {
+      setTimeout(() => {
+        if (this.peer && this.peer.status === LinkStatus.ACTIVE) {
+          this.peer._receiveData(sendBuffer);
+        }
+      }, Math.round(totalDelayMs));
+    }
 
     return true;
   }

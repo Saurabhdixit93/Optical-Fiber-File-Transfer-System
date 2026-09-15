@@ -1,0 +1,14 @@
+{
+  "name": "@optical/cli",
+  "version": "1.0.0",
+  "type": "module",
+  "bin": {
+    "optical-transfer": "./src/index.js"
+  },
+  "dependencies": {
+    "@optical/shared": "*",
+    "@optical/protocol": "*",
+    "@optical/transport": "*",
+    "@optical/transfer-engine": "*"
+  }
+}

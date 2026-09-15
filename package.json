@@ -1,0 +1,26 @@
+{
+  "name": "optical-file-transfer",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Production-Grade Optical Fiber File Transfer System",
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "test": "node --test --test-concurrency=1 tests/**/*.test.js",
+    "cli": "node apps/cli/src/index.js",
+    "dev:desktop": "npm --workspace=apps/desktop run dev",
+    "start:desktop": "npm --workspace=apps/desktop run start",
+    "benchmark": "node apps/cli/src/index.js benchmark"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.11.4",
+    "typescript": "^5.4.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

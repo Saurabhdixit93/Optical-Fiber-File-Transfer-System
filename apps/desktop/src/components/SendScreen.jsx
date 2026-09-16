@@ -90,13 +90,13 @@ export default function SendScreen({ onStartSend, targetReceiverId, setTargetRec
   };
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto font-mono">
+    <div className="space-y-4 sm:space-y-6 max-w-4xl mx-auto font-mono">
       {/* WebSocket Room Code Panel */}
       {mode === 'WebSocket' && (
-        <div className="bg-gradient-to-r from-cyan-500/10 to-blue-600/10 border border-cyan-500/30 p-5 rounded-xl space-y-3 text-xs">
-          <div className="flex items-center justify-between">
-            <label className="text-cyan-300 font-bold flex items-center gap-2 text-sm">
-              <Globe className="w-4 h-4" />
+        <div className="bg-gradient-to-r from-cyan-500/10 to-blue-600/10 border border-cyan-500/30 p-4 sm:p-5 rounded-xl space-y-3 text-xs">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+            <label className="text-cyan-300 font-bold flex items-center gap-2 text-xs sm:text-sm">
+              <Globe className="w-4 h-4 flex-shrink-0" />
               WEBSOCKET TRANSFER MODE — Room Pairing
             </label>
             {peerConnected && (
@@ -106,12 +106,12 @@ export default function SendScreen({ onStartSend, targetReceiverId, setTargetRec
             )}
           </div>
 
-          <div className="bg-[#0d1322] p-4 rounded-xl border border-[#243252] space-y-3">
-            <div className="flex items-center gap-3">
+          <div className="bg-[#0d1322] p-3 sm:p-4 rounded-xl border border-[#243252] space-y-3">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
               <div className="flex-1">
                 <p className="text-gray-400 text-[10px] uppercase mb-1">Room Code (Share with receiver)</p>
                 <div className="flex items-center gap-2">
-                  <span className="text-2xl font-black tracking-[0.3em] text-cyan-300">
+                  <span className="text-xl sm:text-2xl font-black tracking-[0.3em] text-cyan-300">
                     {roomCode || '------'}
                   </span>
                   {!roomCode && (
@@ -125,17 +125,17 @@ export default function SendScreen({ onStartSend, targetReceiverId, setTargetRec
                 </div>
               </div>
               {roomCode && (
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-row sm:flex-col gap-2 w-full sm:w-auto">
                   <button
                     onClick={handleCopyRoomCode}
-                    className="flex items-center gap-1.5 bg-[#1a243b] hover:bg-[#243252] text-cyan-300 text-xs px-3 py-2 rounded-lg border border-cyan-500/30 transition-all"
+                    className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 bg-[#1a243b] hover:bg-[#243252] text-cyan-300 text-xs px-3 py-2 rounded-lg border border-cyan-500/30 transition-all"
                   >
                     {copiedRoom ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                     {copiedRoom ? 'Copied!' : 'Copy Code'}
                   </button>
                   <button
                     onClick={handleCopyLink}
-                    className="flex items-center gap-1.5 bg-[#1a243b] hover:bg-[#243252] text-purple-300 text-xs px-3 py-2 rounded-lg border border-purple-500/30 transition-all"
+                    className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 bg-[#1a243b] hover:bg-[#243252] text-purple-300 text-xs px-3 py-2 rounded-lg border border-purple-500/30 transition-all"
                   >
                     {copiedLink ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Link className="w-3.5 h-3.5" />}
                     {copiedLink ? 'Copied!' : 'Copy Link'}
@@ -151,11 +151,11 @@ export default function SendScreen({ onStartSend, targetReceiverId, setTargetRec
       )}
 
       {/* Target Receiver ID & QR Scanner Selection Box */}
-      <div className="bg-[#131b2e] border border-[#243252] p-5 rounded-xl space-y-3 text-xs">
-        <div className="flex items-center justify-between">
-          <label className="text-gray-300 font-bold flex items-center gap-2">
-            <UserCheck className="w-4 h-4 text-cyan-400" />
-            TARGET RECEIVER DEVICE ID (SELECT ANY OR SPECIFIC NODE):
+      <div className="bg-[#131b2e] border border-[#243252] p-4 sm:p-5 rounded-xl space-y-3 text-xs">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+          <label className="text-gray-300 font-bold flex items-center gap-2 text-[11px] sm:text-xs">
+            <UserCheck className="w-4 h-4 text-cyan-400 flex-shrink-0" />
+            TARGET RECEIVER DEVICE ID:
           </label>
 
           {pairedSuccess && (
@@ -180,9 +180,9 @@ export default function SendScreen({ onStartSend, targetReceiverId, setTargetRec
             }}
             className="bg-[#0d1322] border border-[#243252] rounded-xl px-3 py-2.5 text-cyan-300 font-bold focus:outline-none focus:border-cyan-500 cursor-pointer"
           >
-            <option value="ANY">ANY (Broadcast / Accept Any Receiver)</option>
-            <option value="OPT-NODE-RECEIVER-90B1">OPT-NODE-RECEIVER-90B1 (Default Receiver)</option>
-            <option value="OPT-NODE-ALPHA">OPT-NODE-ALPHA (Secondary Node)</option>
+            <option value="ANY">ANY (Accept Any Receiver)</option>
+            <option value="OPT-NODE-RECEIVER-90B1">OPT-NODE-RECEIVER-90B1</option>
+            <option value="OPT-NODE-ALPHA">OPT-NODE-ALPHA</option>
             <option value="CUSTOM">Custom ID / Scanned QR...</option>
           </select>
 
@@ -238,25 +238,25 @@ export default function SendScreen({ onStartSend, targetReceiverId, setTargetRec
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         onClick={() => fileInputRef.current && fileInputRef.current.click()}
-        className={`bg-[#131b2e] border-2 border-dashed p-10 rounded-xl text-center space-y-4 cursor-pointer transition-all ${
+        className={`bg-[#131b2e] border-2 border-dashed p-6 sm:p-10 rounded-xl text-center space-y-4 cursor-pointer transition-all ${
           isDragging
             ? 'border-cyan-400 bg-cyan-500/10 scale-[1.01]'
             : 'border-[#243252] hover:border-cyan-500/50'
         }`}
       >
-        <div className="mx-auto w-16 h-16 rounded-full bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
-          <UploadCloud className="w-8 h-8" />
+        <div className="mx-auto w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+          <UploadCloud className="w-6 h-6 sm:w-8 sm:h-8" />
         </div>
         <div>
-          <h2 className="text-lg font-bold text-gray-100">
+          <h2 className="text-base sm:text-lg font-bold text-gray-100">
             {isDragging ? 'Drop Your Real Files Now' : 'Drag & Drop Your Real Files Here'}
           </h2>
-          <p className="text-xs text-gray-400 font-mono mt-1">
-            Files will be encrypted and transmitted strictly to Receiver <span className="text-cyan-400 font-bold">{targetReceiverId}</span>
+          <p className="text-[11px] sm:text-xs text-gray-400 font-mono mt-1">
+            Files will be transmitted strictly to Target <span className="text-cyan-400 font-bold">{targetReceiverId}</span>
           </p>
         </div>
 
-        <div className="flex justify-center space-x-3 pt-2" onClick={(e) => e.stopPropagation()}>
+        <div className="flex flex-wrap justify-center gap-2 pt-2" onClick={(e) => e.stopPropagation()}>
           <button
             type="button"
             onClick={() => fileInputRef.current && fileInputRef.current.click()}
@@ -278,8 +278,8 @@ export default function SendScreen({ onStartSend, targetReceiverId, setTargetRec
       </div>
 
       {/* Queue List */}
-      <div className="bg-[#131b2e] border border-[#243252] p-6 rounded-xl space-y-4">
-        <div className="flex justify-between items-center border-b border-[#243252] pb-3">
+      <div className="bg-[#131b2e] border border-[#243252] p-4 sm:p-6 rounded-xl space-y-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-[#243252] pb-3 gap-2">
           <h3 className="font-bold text-sm text-gray-200">
             Selected Transfer Queue ({fileList.length})
           </h3>
@@ -303,14 +303,14 @@ export default function SendScreen({ onStartSend, targetReceiverId, setTargetRec
             {fileList.map((item) => (
               <div
                 key={item.id}
-                className="flex items-center justify-between bg-[#0d1322] p-3 rounded-lg border border-[#243252] font-mono text-xs hover:border-cyan-500/30 transition-colors"
+                className="flex items-center justify-between bg-[#0d1322] p-3 rounded-lg border border-[#243252] font-mono text-xs hover:border-cyan-500/30 transition-colors gap-2"
               >
-                <div className="flex items-center space-x-3 overflow-hidden">
+                <div className="flex items-center space-x-3 overflow-hidden min-w-0">
                   <File className="w-4 h-4 text-cyan-400 flex-shrink-0" />
-                  <span className="font-semibold text-gray-200 truncate">{item.name}</span>
+                  <span className="font-semibold text-gray-200 truncate max-w-[160px] sm:max-w-xs">{item.name}</span>
                 </div>
-                <div className="flex items-center space-x-4 flex-shrink-0">
-                  <span className="text-gray-400">{item.sizeText}</span>
+                <div className="flex items-center space-x-3 flex-shrink-0">
+                  <span className="text-gray-400 text-[11px] sm:text-xs">{item.sizeText}</span>
                   <button
                     onClick={() => removeItem(item.id)}
                     className="text-rose-400 hover:text-rose-300 p-1"
@@ -327,14 +327,14 @@ export default function SendScreen({ onStartSend, targetReceiverId, setTargetRec
           </div>
         )}
 
-        <div className="pt-4 flex justify-end space-x-3">
+        <div className="pt-2 flex justify-end">
           <button
             onClick={() => fileList.length > 0 && onStartSend(fileList[0].fileObj || fileList[0])}
             disabled={fileList.length === 0}
-            className="flex items-center space-x-2 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-black font-bold font-mono text-xs px-6 py-3 rounded-lg shadow-lg disabled:opacity-50"
+            className="w-full sm:w-auto flex items-center justify-center space-x-2 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-black font-bold font-mono text-xs px-6 py-3 rounded-lg shadow-lg disabled:opacity-50"
           >
             <Play className="w-4 h-4 fill-current" />
-            <span>Send to Receiver {targetReceiverId}</span>
+            <span className="truncate">Send to Receiver {targetReceiverId}</span>
           </button>
         </div>
       </div>

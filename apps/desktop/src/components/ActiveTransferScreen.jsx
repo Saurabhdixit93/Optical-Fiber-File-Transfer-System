@@ -29,34 +29,34 @@ export default function ActiveTransferScreen({
   const isCompleted = activeTransfer.state === 'COMPLETED';
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header Controls */}
-      <div className="bg-[#131b2e] border border-[#243252] p-6 rounded-xl flex justify-between items-center">
+      <div className="bg-[#131b2e] border border-[#243252] p-4 sm:p-6 rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
         <div>
-          <div className="text-xs font-mono text-cyan-400 uppercase tracking-wider flex items-center gap-2">
+          <div className="text-xs font-mono text-cyan-400 uppercase tracking-wider flex flex-wrap items-center gap-2">
             OPTICAL SESSION
             {isHashing && (
-              <span className="px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/40 animate-pulse">
+              <span className="px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/40 animate-pulse text-[10px] sm:text-xs">
                 HASHING SHA-256
               </span>
             )}
             {isCompleted && (
-              <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold flex items-center gap-1">
+              <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold flex items-center gap-1 text-[10px] sm:text-xs">
                 <CheckCircle2 className="w-3.5 h-3.5" /> VERIFIED COMPLETED
               </span>
             )}
           </div>
-          <h2 className="text-lg font-bold text-gray-100 font-mono mt-1">{activeTransfer.filename}</h2>
+          <h2 className="text-base sm:text-lg font-bold text-gray-100 font-mono mt-1 truncate max-w-full">{activeTransfer.filename}</h2>
         </div>
 
-        <div className="flex space-x-3">
+        <div className="flex flex-wrap gap-2 sm:gap-3 w-full sm:w-auto">
           {isCompleted ? (
             <>
               {activeTransfer.downloadUrl && (
                 <a
                   href={activeTransfer.downloadUrl}
                   download={activeTransfer.filename}
-                  className="flex items-center space-x-1.5 bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs font-mono px-4 py-2 rounded-lg shadow-lg transition-all"
+                  className="flex-1 sm:flex-none flex items-center justify-center space-x-1.5 bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs font-mono px-4 py-2 rounded-lg shadow-lg transition-all"
                 >
                   <Download className="w-4 h-4" />
                   <span>Save Received File</span>
@@ -64,7 +64,7 @@ export default function ActiveTransferScreen({
               )}
               <button
                 onClick={onNewTransfer}
-                className="flex items-center space-x-1.5 bg-cyan-500 hover:bg-cyan-400 text-black font-bold text-xs font-mono px-4 py-2 rounded-lg shadow-lg"
+                className="flex-1 sm:flex-none flex items-center justify-center space-x-1.5 bg-cyan-500 hover:bg-cyan-400 text-black font-bold text-xs font-mono px-4 py-2 rounded-lg shadow-lg"
               >
                 <span>Send Another File</span>
                 <ArrowRight className="w-4 h-4" />
@@ -75,7 +75,7 @@ export default function ActiveTransferScreen({
               {activeTransfer.state === 'PAUSED' ? (
                 <button
                   onClick={onResume}
-                  className="flex items-center space-x-1.5 bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs font-mono px-4 py-2 rounded-lg"
+                  className="flex-1 sm:flex-none flex items-center justify-center space-x-1.5 bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs font-mono px-4 py-2 rounded-lg"
                 >
                   <Play className="w-4 h-4 fill-current" />
                   <span>Resume</span>
@@ -84,7 +84,7 @@ export default function ActiveTransferScreen({
                 <button
                   onClick={onPause}
                   disabled={isHashing}
-                  className="flex items-center space-x-1.5 bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs font-mono px-4 py-2 rounded-lg disabled:opacity-50"
+                  className="flex-1 sm:flex-none flex items-center justify-center space-x-1.5 bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs font-mono px-4 py-2 rounded-lg disabled:opacity-50"
                 >
                   <Pause className="w-4 h-4 fill-current" />
                   <span>Pause</span>
@@ -93,7 +93,7 @@ export default function ActiveTransferScreen({
 
               <button
                 onClick={onCancel}
-                className="flex items-center space-x-1.5 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 font-bold text-xs font-mono px-4 py-2 rounded-lg"
+                className="flex-1 sm:flex-none flex items-center justify-center space-x-1.5 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 font-bold text-xs font-mono px-4 py-2 rounded-lg"
               >
                 <XCircle className="w-4 h-4" />
                 <span>Cancel</span>
@@ -105,16 +105,16 @@ export default function ActiveTransferScreen({
 
       {/* Completion Confirmation Banner */}
       {isCompleted && (
-        <div className="bg-[#131b2e] border border-emerald-500/50 p-6 rounded-xl space-y-4 shadow-2xl">
+        <div className="bg-[#131b2e] border border-emerald-500/50 p-4 sm:p-6 rounded-xl space-y-4 shadow-2xl">
           <div className="flex items-center space-x-3">
-            <div className="p-3 bg-emerald-500/20 rounded-xl text-emerald-400 border border-emerald-500/30">
-              <CheckCircle2 className="w-8 h-8" />
+            <div className="p-3 bg-emerald-500/20 rounded-xl text-emerald-400 border border-emerald-500/30 flex-shrink-0">
+              <CheckCircle2 className="w-6 h-6 sm:w-8 sm:h-8" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-gray-100 font-mono">
+              <h3 className="text-sm sm:text-base font-bold text-gray-100 font-mono">
                 Optical Transfer Successfully Verified & Completed!
               </h3>
-              <p className="text-xs text-emerald-300 font-mono mt-0.5">
+              <p className="text-[11px] sm:text-xs text-emerald-300 font-mono mt-0.5">
                 All binary packet frames received, CRC32 validated, and SHA-256 hash match confirmed.
               </p>
             </div>
@@ -124,7 +124,7 @@ export default function ActiveTransferScreen({
             <div className="bg-gradient-to-r from-emerald-500 to-teal-400 h-full rounded-full w-full" />
           </div>
 
-          <div className="grid grid-cols-3 gap-4 font-mono text-xs pt-2">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 font-mono text-xs pt-2">
             <div className="bg-[#0d1322] p-3 rounded-lg border border-[#243252]">
               <span className="text-gray-400 block text-[10px]">PAYLOAD SIZE</span>
               <span className="text-white font-bold text-sm">{(activeTransfer.fileSize / 1024).toFixed(1)} KB</span>
@@ -145,16 +145,16 @@ export default function ActiveTransferScreen({
 
       {/* SHA256 Hashing Banner for Multi-GB Files */}
       {isHashing && (
-        <div className="bg-[#131b2e] border border-purple-500/50 p-6 rounded-xl space-y-4 shadow-2xl">
+        <div className="bg-[#131b2e] border border-purple-500/50 p-4 sm:p-6 rounded-xl space-y-4 shadow-2xl">
           <div className="flex items-center space-x-3">
-            <div className="p-3 bg-purple-500/20 rounded-xl text-purple-400 border border-purple-500/30">
-              <RefreshCw className="w-6 h-6 animate-spin" />
+            <div className="p-3 bg-purple-500/20 rounded-xl text-purple-400 border border-purple-500/30 flex-shrink-0">
+              <RefreshCw className="w-5 h-5 sm:w-6 sm:h-6 animate-spin" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-gray-100 font-mono">
+              <h3 className="text-sm sm:text-base font-bold text-gray-100 font-mono">
                 Calculating SHA-256 Cryptographic Checksum ({activeTransfer.progressPercent}%)
               </h3>
-              <p className="text-xs text-purple-300 font-mono mt-0.5">
+              <p className="text-[11px] sm:text-xs text-purple-300 font-mono mt-0.5">
                 Reading binary payload & computing SHA-256 before optical handshake transmission...
               </p>
             </div>
@@ -176,31 +176,31 @@ export default function ActiveTransferScreen({
 
       {/* Main Throughput Graph */}
       {!isHashing && (
-        <div className="bg-[#131b2e] border border-[#243252] p-6 rounded-xl space-y-4">
+        <div className="bg-[#131b2e] border border-[#243252] p-4 sm:p-6 rounded-xl space-y-4">
           <ThroughputChart history={speedHistory} />
         </div>
       )}
 
       {/* Real Time Telemetry Grid */}
-      <div className="grid grid-cols-3 gap-4 font-mono text-xs">
-        <div className="bg-[#131b2e] border border-[#243252] p-4 rounded-xl space-y-2">
-          <div className="text-gray-400 uppercase">TRANSFER METRICS</div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4 font-mono text-xs">
+        <div className="bg-[#131b2e] border border-[#243252] p-3 sm:p-4 rounded-xl space-y-2">
+          <div className="text-gray-400 uppercase text-[10px]">TRANSFER METRICS</div>
           <div className="flex justify-between"><span>Bytes Transferred:</span> <span className="text-white">{(activeTransfer.bytesTransferred / 1024).toFixed(1)} KB</span></div>
           <div className="flex justify-between"><span>Total File Size:</span> <span className="text-white">{(activeTransfer.fileSize / 1024).toFixed(1)} KB</span></div>
           <div className="flex justify-between"><span>Estimated Remaining:</span> <span className="text-amber-400">{activeTransfer.etaSeconds || 0} sec</span></div>
         </div>
 
-        <div className="bg-[#131b2e] border border-[#243252] p-4 rounded-xl space-y-2">
-          <div className="text-gray-400 uppercase">PACKET PROTOCOL STATS</div>
+        <div className="bg-[#131b2e] border border-[#243252] p-3 sm:p-4 rounded-xl space-y-2">
+          <div className="text-gray-400 uppercase text-[10px]">PACKET PROTOCOL STATS</div>
           <div className="flex justify-between"><span>Packets Sent:</span> <span className="text-cyan-400">{activeTransfer.packetsSent || 1}</span></div>
           <div className="flex justify-between"><span>Retransmissions:</span> <span className="text-amber-400">{activeTransfer.packetsRetransmitted || 0}</span></div>
           <div className="flex justify-between"><span>CRC32 Failures:</span> <span className="text-emerald-400">0</span></div>
         </div>
 
-        <div className="bg-[#131b2e] border border-[#243252] p-4 rounded-xl space-y-2">
-          <div className="text-gray-400 uppercase">TARGETED HANDSHAKE STATE</div>
-          <div className="flex justify-between"><span>Target Receiver:</span> <span className="text-cyan-400">{activeTransfer.targetReceiverId}</span></div>
-          <div className="flex justify-between"><span>Sender ID:</span> <span className="text-purple-300">{activeTransfer.senderId}</span></div>
+        <div className="bg-[#131b2e] border border-[#243252] p-3 sm:p-4 rounded-xl space-y-2">
+          <div className="text-gray-400 uppercase text-[10px]">TARGETED HANDSHAKE STATE</div>
+          <div className="flex justify-between"><span>Target Receiver:</span> <span className="text-cyan-400 truncate max-w-[120px]">{activeTransfer.targetReceiverId}</span></div>
+          <div className="flex justify-between"><span>Sender ID:</span> <span className="text-purple-300 truncate max-w-[120px]">{activeTransfer.senderId}</span></div>
           <div className="flex justify-between"><span>State Machine:</span> <span className="text-purple-400">{activeTransfer.state}</span></div>
         </div>
       </div>

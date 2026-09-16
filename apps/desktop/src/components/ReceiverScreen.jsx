@@ -149,10 +149,10 @@ export default function ReceiverScreen({
 
       {/* WebSocket Room Join Panel */}
       {mode === 'WebSocket' && (
-        <div className="bg-gradient-to-r from-cyan-500/10 to-blue-600/10 border border-cyan-500/30 p-6 rounded-xl space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-sm font-bold text-cyan-300 flex items-center gap-2 font-mono">
-              <Globe className="w-5 h-5" />
+        <div className="bg-gradient-to-r from-cyan-500/10 to-blue-600/10 border border-cyan-500/30 p-4 sm:p-6 rounded-xl space-y-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+            <h2 className="text-xs sm:text-sm font-bold text-cyan-300 flex items-center gap-2 font-mono">
+              <Globe className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
               WEBSOCKET RECEIVER — Join Transfer Room
             </h2>
             {isListening && (
@@ -170,25 +170,25 @@ export default function ReceiverScreen({
             )}
           </div>
 
-          <div className="bg-[#0d1322] p-4 rounded-xl border border-[#243252] space-y-3">
+          <div className="bg-[#0d1322] p-3 sm:p-4 rounded-xl border border-[#243252] space-y-3">
             {!isListening ? (
               <>
                 <p className="text-gray-400 text-xs font-mono">
                   Enter the room code shared by the sender to start receiving files.
                 </p>
-                <div className="flex items-center gap-3">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                   <input
                     type="text"
                     value={joinRoomCode}
                     onChange={(e) => setJoinRoomCode(e.target.value.toUpperCase())}
                     placeholder="Enter Room Code (e.g. A3K9XP)"
                     maxLength={10}
-                    className="flex-1 bg-[#131b2e] border border-[#243252] rounded-xl px-4 py-3 text-xl font-black tracking-[0.3em] text-cyan-300 text-center focus:outline-none focus:border-cyan-500 placeholder:text-gray-600 placeholder:text-sm placeholder:tracking-normal placeholder:font-normal font-mono"
+                    className="flex-1 bg-[#131b2e] border border-[#243252] rounded-xl px-4 py-3 text-lg sm:text-2xl font-black tracking-[0.3em] text-cyan-300 text-center focus:outline-none focus:border-cyan-500 placeholder:text-gray-600 placeholder:text-sm placeholder:tracking-normal placeholder:font-normal font-mono"
                   />
                   <button
                     onClick={handleJoinRoom}
                     disabled={isJoining || !joinRoomCode.trim()}
-                    className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-black font-bold text-xs px-6 py-3 rounded-xl shadow-lg disabled:opacity-50 flex items-center gap-2 transition-all"
+                    className="w-full sm:w-auto bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-black font-bold text-xs px-6 py-3 rounded-xl shadow-lg disabled:opacity-50 flex items-center justify-center gap-2 transition-all"
                   >
                     {isJoining ? (
                       <><Loader2 className="w-4 h-4 animate-spin" /> Connecting...</>
@@ -206,11 +206,11 @@ export default function ReceiverScreen({
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-gray-400 text-[10px] uppercase font-mono">Connected to Room</p>
-                    <span className="text-2xl font-black tracking-[0.3em] text-cyan-300 font-mono">{roomCode}</span>
+                    <span className="text-xl sm:text-2xl font-black tracking-[0.3em] text-cyan-300 font-mono">{roomCode}</span>
                   </div>
                   <button
                     onClick={handleDisconnect}
-                    className="flex items-center gap-1.5 bg-rose-500/20 text-rose-400 border border-rose-500/30 px-4 py-2 rounded-xl hover:bg-rose-500/30 transition-all text-xs font-bold"
+                    className="flex items-center gap-1.5 bg-rose-500/20 text-rose-400 border border-rose-500/30 px-3 py-2 rounded-xl hover:bg-rose-500/30 transition-all text-xs font-bold"
                   >
                     <WifiOff className="w-4 h-4" /> Disconnect
                   </button>
@@ -226,7 +226,7 @@ export default function ReceiverScreen({
       )}
 
       {/* Receiver Node Configuration */}
-      <div className="bg-[#131b2e] border border-[#243252] p-6 rounded-xl space-y-4">
+      <div className="bg-[#131b2e] border border-[#243252] p-4 sm:p-6 rounded-xl space-y-4">
         <h2 className="text-base font-bold text-gray-100 flex items-center gap-2">
           <Download className="w-5 h-5 text-emerald-400" />
           Receiver Node Security & Identity
@@ -235,7 +235,7 @@ export default function ReceiverScreen({
         <div className="space-y-4 font-mono text-xs">
           <div>
             <label className="block text-gray-400 mb-1 font-bold">YOUR ASSIGNED RECEIVER DEVICE ID:</label>
-            <div className="flex space-x-2">
+            <div className="flex flex-col sm:flex-row gap-2">
               <input
                 type="text"
                 value={receiverId}
@@ -245,12 +245,12 @@ export default function ReceiverScreen({
               <button
                 type="button"
                 onClick={() => setIsQrModalOpen(true)}
-                className="bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-400 hover:to-indigo-500 text-white px-3.5 py-2 rounded-lg flex items-center gap-1.5 font-bold shadow-md transition-all"
+                className="bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-400 hover:to-indigo-500 text-white px-3.5 py-2 rounded-lg flex items-center justify-center gap-1.5 font-bold shadow-md transition-all"
               >
                 <QrCode className="w-4 h-4" />
                 <span>Show QR Code</span>
               </button>
-              <span className="bg-purple-500/20 text-purple-300 border border-purple-500/40 px-3 py-2 rounded-lg flex items-center gap-1 font-bold">
+              <span className="bg-purple-500/20 text-purple-300 border border-purple-500/40 px-3 py-2 rounded-lg flex items-center justify-center gap-1 font-bold">
                 <Lock className="w-3.5 h-3.5" />
                 Target ID Locked
               </span>

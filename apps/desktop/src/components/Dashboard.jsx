@@ -17,67 +17,67 @@ export default function Dashboard({
   onStartDemoSend,
 }) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Top Telemetry Bar */}
-      <div className="grid grid-cols-4 gap-4">
-        <div className="bg-[#131b2e] border border-[#243252] p-4 rounded-xl shadow-sm">
-          <div className="text-xs font-mono text-gray-400">LINK SPEED</div>
-          <div className="text-2xl font-bold text-cyan-400 font-mono mt-1">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+        <div className="bg-[#131b2e] border border-[#243252] p-3 sm:p-4 rounded-xl shadow-sm">
+          <div className="text-[10px] sm:text-xs font-mono text-gray-400">LINK SPEED</div>
+          <div className="text-lg sm:text-2xl font-bold text-cyan-400 font-mono mt-1">
             1.00 Gbps
           </div>
-          <div className="text-[11px] text-gray-500 font-mono mt-1">
-            Optical Transceiver Standard
+          <div className="text-[10px] sm:text-[11px] text-gray-500 font-mono mt-1 truncate">
+            Optical Standard
           </div>
         </div>
 
-        <div className="bg-[#131b2e] border border-[#243252] p-4 rounded-xl shadow-sm">
-          <div className="text-xs font-mono text-gray-400">TRANSFER SPEED</div>
-          <div className="text-2xl font-bold text-blue-400 font-mono mt-1">
+        <div className="bg-[#131b2e] border border-[#243252] p-3 sm:p-4 rounded-xl shadow-sm">
+          <div className="text-[10px] sm:text-xs font-mono text-gray-400">TRANSFER SPEED</div>
+          <div className="text-lg sm:text-2xl font-bold text-blue-400 font-mono mt-1">
             {activeTransfer
               ? `${activeTransfer.currentSpeedMbps} Mbps`
               : "0 Mbps"}
           </div>
-          <div className="text-[11px] text-gray-500 font-mono mt-1">
+          <div className="text-[10px] sm:text-[11px] text-gray-500 font-mono mt-1">
             {activeTransfer
               ? `${(activeTransfer.currentSpeedMbps / 8).toFixed(2)} MB/s`
               : "Idle"}
           </div>
         </div>
 
-        <div className="bg-[#131b2e] border border-[#243252] p-4 rounded-xl shadow-sm">
-          <div className="text-xs font-mono text-gray-400">OPTICAL SIGNAL</div>
-          <div className="text-2xl font-bold text-emerald-400 font-mono mt-1">
+        <div className="bg-[#131b2e] border border-[#243252] p-3 sm:p-4 rounded-xl shadow-sm">
+          <div className="text-[10px] sm:text-xs font-mono text-gray-400">OPTICAL SIGNAL</div>
+          <div className="text-lg sm:text-2xl font-bold text-emerald-400 font-mono mt-1">
             Good (0.0 dBm)
           </div>
-          <div className="text-[11px] text-gray-500 font-mono mt-1">
+          <div className="text-[10px] sm:text-[11px] text-gray-500 font-mono mt-1">
             Zero attenuation
           </div>
         </div>
 
-        <div className="bg-[#131b2e] border border-[#243252] p-4 rounded-xl shadow-sm">
-          <div className="text-xs font-mono text-gray-400">
+        <div className="bg-[#131b2e] border border-[#243252] p-3 sm:p-4 rounded-xl shadow-sm">
+          <div className="text-[10px] sm:text-xs font-mono text-gray-400">
             PACKET INTEGRITY
           </div>
-          <div className="text-2xl font-bold text-purple-400 font-mono mt-1">
+          <div className="text-lg sm:text-2xl font-bold text-purple-400 font-mono mt-1">
             CRC32 / SHA256
           </div>
-          <div className="text-[11px] text-gray-500 font-mono mt-1">
+          <div className="text-[10px] sm:text-[11px] text-gray-500 font-mono mt-1">
             100% Verified
           </div>
         </div>
       </div>
 
       {/* Current Transfer Section */}
-      <div className="bg-[#131b2e] border border-[#243252] p-6 rounded-xl space-y-4">
-        <div className="flex justify-between items-center">
-          <h2 className="text-base font-bold text-gray-100 flex items-center gap-2">
+      <div className="bg-[#131b2e] border border-[#243252] p-4 sm:p-6 rounded-xl space-y-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+          <h2 className="text-sm sm:text-base font-bold text-gray-100 flex items-center gap-2">
             <ArrowUpRight className="w-5 h-5 text-cyan-400" />
             Current Transfer Status
           </h2>
           {!activeTransfer && (
             <button
               onClick={onStartDemoSend}
-              className="bg-cyan-500 hover:bg-cyan-400 text-black font-semibold text-xs px-4 py-2 rounded-lg font-mono transition-all shadow-md"
+              className="w-full sm:w-auto bg-cyan-500 hover:bg-cyan-400 text-black font-semibold text-xs px-4 py-2 rounded-lg font-mono transition-all shadow-md"
             >
               + Start Simulated Transfer (100 MB)
             </button>
@@ -85,12 +85,12 @@ export default function Dashboard({
         </div>
 
         {activeTransfer ? (
-          <div className="space-y-4 bg-[#0d1322] p-4 rounded-lg border border-[#243252]">
-            <div className="flex justify-between items-center text-sm font-mono">
-              <span className="font-bold text-cyan-300">
+          <div className="space-y-4 bg-[#0d1322] p-3 sm:p-4 rounded-lg border border-[#243252]">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center text-xs sm:text-sm font-mono gap-1">
+              <span className="font-bold text-cyan-300 truncate max-w-full">
                 {activeTransfer.filename || "dataset.bin"}
               </span>
-              <span className="text-gray-400">
+              <span className="text-gray-400 text-xs">
                 {(activeTransfer.bytesTransferred / (1024 * 1024)).toFixed(1)}{" "}
                 MB / {(activeTransfer.fileSize / (1024 * 1024)).toFixed(1)} MB
               </span>
@@ -104,7 +104,7 @@ export default function Dashboard({
               />
             </div>
 
-            <div className="flex justify-between text-xs font-mono text-gray-400">
+            <div className="flex flex-wrap justify-between text-xs font-mono text-gray-400 gap-2">
               <span>
                 Progress:{" "}
                 <strong className="text-white">

@@ -23,7 +23,9 @@ export default function Sidebar({
   myDeviceId,
   collapsed,
   setCollapsed,
-  activeTransfer
+  activeTransfer,
+  isMobileOpen,
+  onCloseMobile
 }) {
   const [copied, setCopied] = useState(false);
 
@@ -44,84 +46,96 @@ export default function Sidebar({
   };
 
   return (
-    <aside
-      className={`h-screen sticky top-0 flex-shrink-0 bg-[#131b2e] border-r border-[#243252] flex flex-col justify-between transition-all duration-300 relative z-30 shadow-2xl ${
-        collapsed ? 'w-20' : 'w-64'
-      }`}
-    >
-      {/* Top Header & Collapse Toggle */}
-      <div>
-        <div className="h-16 border-b border-[#243252] px-3 flex items-center justify-between">
-          {!collapsed ? (
-            <>
-              <div className="flex items-center space-x-3 overflow-hidden">
-                <div className="p-2 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 flex-shrink-0">
-                  <Radio className="w-5 h-5 animate-pulse" />
+    <>
+      {/* Mobile Drawer Backdrop */}
+      {isMobileOpen && (
+        <div
+          onClick={onCloseMobile}
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-40 md:hidden"
+        />
+      )}
+
+      <aside
+        className={`h-screen fixed md:sticky top-0 left-0 z-50 flex-shrink-0 bg-[#131b2e] border-r border-[#243252] flex flex-col justify-between transition-all duration-300 shadow-2xl ${
+          isMobileOpen ? 'translate-x-0 w-64' : '-translate-x-full md:translate-x-0'
+        } ${collapsed ? 'md:w-20' : 'md:w-64'}`}
+      >
+        {/* Top Header & Collapse Toggle */}
+        <div>
+          <div className="h-16 border-b border-[#243252] px-3 flex items-center justify-between">
+            {!collapsed ? (
+              <>
+                <div className="flex items-center space-x-3 overflow-hidden">
+                  <div className="p-2 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 flex-shrink-0">
+                    <Radio className="w-5 h-5 animate-pulse" />
+                  </div>
+                  <div className="whitespace-nowrap overflow-hidden">
+                    <h1 className="text-sm font-bold tracking-wider text-gray-100 flex items-center gap-1.5 font-mono">
+                      OPTICAL
+                      <span className="text-[10px] bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 px-1.5 py-0.2 rounded">
+                        v1.0
+                      </span>
+                    </h1>
+                    <p className="text-[10px] text-gray-400 font-mono tracking-widest uppercase">Fiber Protocol</p>
+                  </div>
                 </div>
-                <div className="whitespace-nowrap overflow-hidden">
-                  <h1 className="text-sm font-bold tracking-wider text-gray-100 flex items-center gap-1.5 font-mono">
-                    OPTICAL
-                    <span className="text-[10px] bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 px-1.5 py-0.2 rounded">
-                      v1.0
-                    </span>
-                  </h1>
-                  <p className="text-[10px] text-gray-400 font-mono tracking-widest uppercase">Fiber Protocol</p>
-                </div>
+
+                <button
+                  onClick={() => setCollapsed(true)}
+                  className="hidden md:flex p-1.5 rounded-lg bg-[#0d1322] border border-[#243252] text-gray-400 hover:text-cyan-400 hover:border-cyan-500/40 transition-all flex-shrink-0"
+                  title="Collapse Sidebar"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+              </>
+            ) : (
+              <div className="w-full flex items-center justify-center relative">
+                <button
+                  onClick={() => setCollapsed(false)}
+                  className="hidden md:flex p-2.5 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/20 hover:border-cyan-400 transition-all items-center justify-center shadow-lg"
+                  title="Expand Sidebar"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
               </div>
+            )}
+          </div>
 
-              <button
-                onClick={() => setCollapsed(true)}
-                className="p-1.5 rounded-lg bg-[#0d1322] border border-[#243252] text-gray-400 hover:text-cyan-400 hover:border-cyan-500/40 transition-all flex-shrink-0"
-                title="Collapse Sidebar"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-            </>
-          ) : (
-            <div className="w-full flex items-center justify-center relative">
-              <button
-                onClick={() => setCollapsed(false)}
-                className="p-2.5 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/20 hover:border-cyan-400 transition-all flex items-center justify-center shadow-lg"
-                title="Expand Sidebar"
-              >
-                <ChevronRight className="w-5 h-5" />
-              </button>
-            </div>
-          )}
+          {/* Navigation Items */}
+          <nav className="p-3 space-y-1.5">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => {
+                    setActiveTab(tab.id);
+                    if (onCloseMobile) onCloseMobile();
+                  }}
+                  title={collapsed ? tab.label : ''}
+                  className={`w-full flex items-center ${
+                    collapsed ? 'md:justify-center md:px-0 px-3.5' : 'justify-between px-3.5'
+                  } py-3 rounded-xl font-mono text-xs transition-all group ${
+                    isActive
+                      ? 'bg-gradient-to-r from-cyan-500/20 to-blue-600/20 text-cyan-300 border-l-4 border-cyan-400 font-bold shadow-md'
+                      : 'text-gray-400 hover:text-gray-200 hover:bg-[#1a243b]'
+                  }`}
+                >
+                  <div className="flex items-center space-x-3">
+                    <Icon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-cyan-400' : 'group-hover:text-gray-200'}`} />
+                    <span className={`${collapsed ? 'md:hidden' : 'inline'} truncate`}>{tab.label}</span>
+                  </div>
+                  {tab.badge && (
+                    <span className="bg-cyan-500 text-black font-bold text-[10px] px-2 py-0.5 rounded-full font-mono animate-pulse">
+                      {tab.badge}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </nav>
         </div>
-
-        {/* Navigation Items */}
-        <nav className="p-3 space-y-1.5">
-          {tabs.map((tab) => {
-            const Icon = tab.icon;
-            const isActive = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                title={collapsed ? tab.label : ''}
-                className={`w-full flex items-center ${
-                  collapsed ? 'justify-center px-0' : 'justify-between px-3.5'
-                } py-3 rounded-xl font-mono text-xs transition-all group ${
-                  isActive
-                    ? 'bg-gradient-to-r from-cyan-500/20 to-blue-600/20 text-cyan-300 border-l-4 border-cyan-400 font-bold shadow-md'
-                    : 'text-gray-400 hover:text-gray-200 hover:bg-[#1a243b]'
-                }`}
-              >
-                <div className="flex items-center space-x-3">
-                  <Icon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-cyan-400' : 'group-hover:text-gray-200'}`} />
-                  {!collapsed && <span className="truncate">{tab.label}</span>}
-                </div>
-                {!collapsed && tab.badge && (
-                  <span className="bg-cyan-500 text-black font-bold text-[10px] px-2 py-0.5 rounded-full font-mono animate-pulse">
-                    {tab.badge}
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </nav>
-      </div>
 
       {/* Bottom Telemetry & Status Panel */}
       <div className="p-3 border-t border-[#243252] space-y-3 bg-[#0d1322]/50 font-mono text-xs">
@@ -203,5 +217,6 @@ export default function Sidebar({
         )}
       </div>
     </aside>
+    </>
   );
 }

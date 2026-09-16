@@ -188,11 +188,11 @@ export default function QRCodeModal({ isOpen, onClose, mode, receiverId, onPairS
   return createPortal(
     <div
       onClick={handleCloseModal}
-      className="fixed inset-0 top-0 left-0 right-0 bottom-0 w-full h-full z-[999999] bg-black/95 backdrop-blur-2xl flex items-center justify-center p-4 font-mono overflow-y-auto"
+      className="fixed inset-0 top-0 left-0 right-0 bottom-0 w-full h-full z-[999999] bg-black/95 backdrop-blur-2xl flex items-center justify-center p-3 sm:p-4 font-mono overflow-y-auto"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-[#131b2e] border border-[#243252] rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-5 relative overflow-hidden my-auto"
+        className="bg-[#131b2e] border border-[#243252] rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-4 sm:p-6 shadow-2xl space-y-4 sm:space-y-5 relative my-auto"
       >
         {/* Header */}
         <div className="flex justify-between items-center border-b border-[#243252] pb-4">

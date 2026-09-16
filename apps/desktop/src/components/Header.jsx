@@ -1,5 +1,5 @@
 import React from 'react';
-import { Activity, Send, Download, Settings, History, Zap, Radio, ShieldCheck } from 'lucide-react';
+import { Activity, Send, Download, Settings, History, Zap, Radio, ShieldCheck, Menu } from 'lucide-react';
 
 const titleMap = {
   dashboard: { title: 'Dashboard', icon: Activity, subtitle: 'Optical link real-time throughput & telemetry' },
@@ -11,29 +11,38 @@ const titleMap = {
   settings: { title: 'Settings', icon: Settings, subtitle: 'Protocol chunking, window size & link configuration' },
 };
 
-export default function Header({ activeTab, myDeviceId, targetReceiverId }) {
+export default function Header({ activeTab, myDeviceId, targetReceiverId, onToggleMobileMenu }) {
   const current = titleMap[activeTab] || titleMap.dashboard;
   const Icon = current.icon;
 
   return (
-    <header className="bg-[#131b2e] border-b border-[#243252] px-6 py-4 flex items-center justify-between shadow-sm">
+    <header className="bg-[#131b2e] border-b border-[#243252] px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between shadow-sm flex-shrink-0 z-20">
       <div className="flex items-center space-x-3">
-        <div className="p-2.5 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400">
-          <Icon className="w-5 h-5" />
+        {/* Mobile Hamburger Button */}
+        <button
+          onClick={onToggleMobileMenu}
+          className="md:hidden p-2 rounded-xl bg-[#0d1322] border border-[#243252] text-gray-300 hover:text-cyan-400"
+          title="Open Menu"
+        >
+          <Menu className="w-5 h-5" />
+        </button>
+
+        <div className="p-2 sm:p-2.5 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400">
+          <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
         </div>
         <div>
-          <h1 className="text-lg font-bold text-gray-100 font-mono flex items-center gap-2">
+          <h1 className="text-sm sm:text-lg font-bold text-gray-100 font-mono flex items-center gap-2">
             {current.title}
           </h1>
-          <p className="text-xs text-gray-400 font-mono">{current.subtitle}</p>
+          <p className="text-[10px] sm:text-xs text-gray-400 font-mono hidden sm:block">{current.subtitle}</p>
         </div>
       </div>
 
-      <div className="flex items-center space-x-4 font-mono text-xs">
-        <div className="bg-[#0d1322] px-3 py-1.5 rounded-xl border border-[#243252] flex items-center space-x-2">
-          <ShieldCheck className="w-4 h-4 text-emerald-400" />
-          <span className="text-gray-400">Target Receiver:</span>
-          <span className="text-cyan-400 font-bold">{targetReceiverId}</span>
+      <div className="flex items-center space-x-2 sm:space-x-4 font-mono text-[10px] sm:text-xs">
+        <div className="bg-[#0d1322] px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-xl border border-[#243252] flex items-center space-x-1.5 sm:space-x-2">
+          <ShieldCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-400 flex-shrink-0" />
+          <span className="text-gray-400 hidden xs:inline">Target:</span>
+          <span className="text-cyan-400 font-bold truncate max-w-[100px] sm:max-w-none">{targetReceiverId}</span>
         </div>
       </div>
     </header>

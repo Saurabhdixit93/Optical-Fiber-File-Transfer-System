@@ -10,14 +10,14 @@ export default function SettingsScreen({ settings, setSettings }) {
   };
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto font-mono text-xs">
-      <div className="bg-[#131b2e] border border-[#243252] p-6 rounded-xl space-y-6">
+    <div className="space-y-4 sm:space-y-6 max-w-4xl mx-auto font-mono text-xs">
+      <div className="bg-[#131b2e] border border-[#243252] p-4 sm:p-6 rounded-xl space-y-4 sm:space-y-6">
         <h2 className="text-base font-bold text-gray-100 flex items-center gap-2">
-          <Settings className="w-5 h-5 text-cyan-400" />
+          <Settings className="w-5 h-5 text-cyan-400 flex-shrink-0" />
           Protocol & Transport Configuration
         </h2>
 
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
           <div>
             <label className="block text-gray-400 mb-1">File Chunk Size:</label>
             <select
@@ -73,10 +73,10 @@ export default function SettingsScreen({ settings, setSettings }) {
           </div>
         </div>
 
-        <div className="pt-4 flex justify-end">
+        <div className="pt-2 flex justify-end">
           <button
             onClick={handleSave}
-            className="flex items-center space-x-2 bg-cyan-500 hover:bg-cyan-400 text-black font-bold px-6 py-2.5 rounded-lg shadow-md"
+            className="w-full sm:w-auto flex items-center justify-center space-x-2 bg-cyan-500 hover:bg-cyan-400 text-black font-bold px-6 py-2.5 rounded-lg shadow-md"
           >
             <Save className="w-4 h-4" />
             <span>Save Configuration</span>

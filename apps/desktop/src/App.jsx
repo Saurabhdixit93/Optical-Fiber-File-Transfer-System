@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useCallback, useEffect } from "react";
 import Sidebar from "./components/Sidebar";
 import Header from "./components/Header";
 import Dashboard from "./components/Dashboard";
@@ -9,12 +9,36 @@ import DiagnosticsScreen from "./components/DiagnosticsScreen";
 import SettingsScreen from "./components/SettingsScreen";
 import HistoryScreen from "./components/HistoryScreen";
 
-import { SimulationTransport } from "@optical/transport";
+import { SimulationTransport, WebSocketTransport } from "@optical/transport";
 import { FileSender, FileReceiver } from "@optical/transfer-engine";
+
+/**
+ * Generate a random 6-character room code for WebSocket pairing.
+ */
+function generateRoomCode() {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let code = "";
+  for (let i = 0; i < 6; i++) {
+    code += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return code;
+}
+
+/**
+ * Auto-detect if running on a deployed environment (not localhost dev).
+ */
+function isDeployedEnvironment() {
+  if (typeof window === "undefined") return false;
+  const host = window.location.hostname;
+  return host !== "localhost" && host !== "127.0.0.1" && !host.startsWith("192.168.");
+}
 
 export default function App() {
   const [activeTab, setActiveTab] = useState("dashboard");
-  const [mode, setMode] = useState("Simulation");
+  // Auto-detect mode based on environment
+  const [mode, setMode] = useState(() =>
+    isDeployedEnvironment() ? "WebSocket" : "Simulation"
+  );
   const [linkStatus, setLinkStatus] = useState("ACTIVE");
   const [collapsed, setCollapsed] = useState(false);
 
@@ -40,8 +64,15 @@ export default function App() {
 
   const [historyTransfers, setHistoryTransfers] = useState([]);
 
+  // WebSocket mode state
+  const [roomCode, setRoomCode] = useState("");
+  const [wsConnected, setWsConnected] = useState(false);
+  const [peerConnected, setPeerConnected] = useState(false);
+
   const senderRef = useRef(null);
   const receiverRef = useRef(null);
+  const senderTransportRef = useRef(null);
+  const receiverTransportRef = useRef(null);
 
   const formatSize = (bytes) => {
     if (!bytes) return "0 Bytes";
@@ -50,6 +81,38 @@ export default function App() {
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
+
+  /**
+   * Create a new room code for the sender (WebSocket mode).
+   */
+  const generateNewRoomCode = useCallback(() => {
+    const code = generateRoomCode();
+    setRoomCode(code);
+    setWsConnected(false);
+    setPeerConnected(false);
+    return code;
+  }, []);
+
+  /**
+   * Clean up any active WebSocket transports.
+   */
+  const cleanupTransports = useCallback(() => {
+    if (senderTransportRef.current && senderTransportRef.current instanceof WebSocketTransport) {
+      senderTransportRef.current.disconnect();
+    }
+    if (receiverTransportRef.current && receiverTransportRef.current instanceof WebSocketTransport) {
+      receiverTransportRef.current.disconnect();
+    }
+    senderTransportRef.current = null;
+    receiverTransportRef.current = null;
+    setWsConnected(false);
+    setPeerConnected(false);
+  }, []);
+
+  // Clean up on mode change
+  useEffect(() => {
+    return () => cleanupTransports();
+  }, [mode, cleanupTransports]);
 
   const startRealTransfer = async (fileInput) => {
     let fileObj = fileInput;
@@ -79,15 +142,58 @@ export default function App() {
 
     setActiveTab("active");
 
-    const senderTransport = new SimulationTransport({
-      latencyMs: 0.1,
-      lossRate: settings.lossRate,
-    });
-    const receiverTransport = new SimulationTransport({
-      latencyMs: 0.1,
-      lossRate: settings.lossRate,
-    });
-    senderTransport.pair(receiverTransport);
+    let senderTransport, receiverTransport;
+
+    if (mode === "WebSocket") {
+      // ─── WebSocket Mode: Real cross-device transfer ───────────────────
+      const code = roomCode || generateNewRoomCode();
+      setRoomCode(code);
+
+      senderTransport = new WebSocketTransport({
+        roomId: code,
+        role: "sender",
+      });
+
+      // In WebSocket mode, receiver is on a different browser/device.
+      // The sender just connects and sends — the receiver side is handled
+      // by ReceiverScreen joining the same room.
+      // For local demo (both in same browser), we still create a receiver transport.
+      receiverTransport = new WebSocketTransport({
+        roomId: code,
+        role: "receiver",
+      });
+
+      senderTransportRef.current = senderTransport;
+      receiverTransportRef.current = receiverTransport;
+
+      try {
+        await senderTransport.connect();
+        await receiverTransport.connect();
+        setWsConnected(true);
+
+        // Wait briefly for peer notification
+        await new Promise(resolve => setTimeout(resolve, 300));
+        setPeerConnected(true);
+      } catch (err) {
+        console.error("WebSocket connection failed:", err);
+        alert(`WebSocket connection failed: ${err.message}. Make sure the relay server is running.`);
+        setActiveTransfer(null);
+        return;
+      }
+    } else {
+      // ─── Simulation Mode: In-memory loopback (original behavior) ──────
+      senderTransport = new SimulationTransport({
+        latencyMs: 0.1,
+        lossRate: settings.lossRate,
+      });
+      receiverTransport = new SimulationTransport({
+        latencyMs: 0.1,
+        lossRate: settings.lossRate,
+      });
+      senderTransport.pair(receiverTransport);
+      senderTransportRef.current = senderTransport;
+      receiverTransportRef.current = receiverTransport;
+    }
 
     const receiver = new FileReceiver(receiverTransport, {
       destinationDir: "./downloads",
@@ -284,6 +390,11 @@ export default function App() {
               onStartSend={startRealTransfer}
               targetReceiverId={targetReceiverId}
               setTargetReceiverId={setTargetReceiverId}
+              mode={mode}
+              roomCode={roomCode}
+              generateNewRoomCode={generateNewRoomCode}
+              wsConnected={wsConnected}
+              peerConnected={peerConnected}
             />
           )}
 
@@ -306,6 +417,20 @@ export default function App() {
               receivedFiles={receivedFiles}
               autoAccept={autoAccept}
               setAutoAccept={setAutoAccept}
+              mode={mode}
+              roomCode={roomCode}
+              setRoomCode={setRoomCode}
+              wsConnected={wsConnected}
+              setWsConnected={setWsConnected}
+              peerConnected={peerConnected}
+              setPeerConnected={setPeerConnected}
+              settings={settings}
+              formatSize={formatSize}
+              setReceivedFiles={setReceivedFiles}
+              setHistoryTransfers={setHistoryTransfers}
+              setActiveTransfer={setActiveTransfer}
+              setActiveTab={setActiveTab}
+              setSpeedHistory={setSpeedHistory}
             />
           )}
 

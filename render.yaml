@@ -1,0 +1,28 @@
+# ═══════════════════════════════════════════════════════════════
+#   Render Blueprint — Optical Fiber File Transfer System
+# ═══════════════════════════════════════════════════════════════
+#
+#   Deploy to Render:
+#     1. Push this repo to GitHub
+#     2. Go to https://render.com/deploy
+#     3. Connect your GitHub repo
+#     4. Render auto-detects this render.yaml and deploys
+#
+#   Or use the Render Dashboard:
+#     1. New → Web Service → Docker
+#     2. Connect your GitHub repo
+#     3. Render reads this blueprint automatically
+# ═══════════════════════════════════════════════════════════════
+
+services:
+  - type: web
+    name: optical-fiber-transfer
+    runtime: docker
+    plan: free
+    region: oregon
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "3000"

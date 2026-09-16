@@ -1,0 +1,32 @@
+# ═══════════════════════════════════════════════════════════════
+#   Optical Fiber File Transfer System — Docker Compose
+# ═══════════════════════════════════════════════════════════════
+#
+#   Usage:
+#     docker compose up --build        # Build & start
+#     docker compose up -d             # Start in background
+#     docker compose down              # Stop & remove
+#
+#   Access:
+#     Frontend + API:  http://localhost:3000
+#     Health Check:    http://localhost:3000/health
+#     WebSocket:       ws://localhost:3000/ws
+# ═══════════════════════════════════════════════════════════════
+
+services:
+  optical-transfer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s

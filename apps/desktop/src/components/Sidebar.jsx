@@ -10,7 +10,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Copy,
-  Check
+  Check,
+  Globe
 } from 'lucide-react';
 
 export default function Sidebar({
@@ -169,22 +170,35 @@ export default function Sidebar({
         {/* Mode Toggle Button */}
         {!collapsed ? (
           <button
-            onClick={() => setMode(mode === 'Simulation' ? 'Hardware' : 'Simulation')}
-            className={`w-full py-2 px-3 rounded-xl border font-bold text-center transition-all ${
+            onClick={() => {
+              const modes = ['Simulation', 'WebSocket', 'Hardware'];
+              const idx = modes.indexOf(mode);
+              setMode(modes[(idx + 1) % modes.length]);
+            }}
+            className={`w-full py-2 px-3 rounded-xl border font-bold text-center transition-all flex items-center justify-center gap-2 ${
               mode === 'Simulation'
                 ? 'bg-purple-500/10 text-purple-300 border-purple-500/30 hover:bg-purple-500/20'
+                : mode === 'WebSocket'
+                ? 'bg-cyan-500/10 text-cyan-300 border-cyan-500/30 hover:bg-cyan-500/20'
                 : 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30 hover:bg-emerald-500/20'
             }`}
           >
+            {mode === 'WebSocket' && <Globe className="w-3.5 h-3.5" />}
             {mode} Mode
           </button>
         ) : (
           <button
-            onClick={() => setMode(mode === 'Simulation' ? 'Hardware' : 'Simulation')}
-            className="w-full py-2 bg-[#0d1322] rounded-xl border border-[#243252] text-center font-bold text-[10px] text-gray-300"
+            onClick={() => {
+              const modes = ['Simulation', 'WebSocket', 'Hardware'];
+              const idx = modes.indexOf(mode);
+              setMode(modes[(idx + 1) % modes.length]);
+            }}
+            className={`w-full py-2 bg-[#0d1322] rounded-xl border border-[#243252] text-center font-bold text-[10px] ${
+              mode === 'WebSocket' ? 'text-cyan-300' : 'text-gray-300'
+            }`}
             title={`Mode: ${mode}`}
           >
-            {mode[0]}
+            {mode === 'WebSocket' ? <Globe className="w-4 h-4 mx-auto" /> : mode[0]}
           </button>
         )}
       </div>

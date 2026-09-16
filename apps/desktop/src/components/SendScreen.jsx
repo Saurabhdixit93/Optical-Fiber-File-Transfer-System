@@ -1,8 +1,8 @@
 import React, { useState, useRef } from 'react';
-import { UploadCloud, File, Trash2, Play, FolderPlus, PlusCircle, ShieldCheck, UserCheck, QrCode, CheckCircle2 } from 'lucide-react';
+import { UploadCloud, File, Trash2, Play, FolderPlus, PlusCircle, ShieldCheck, UserCheck, QrCode, CheckCircle2, Globe, Copy, Check, Link } from 'lucide-react';
 import QRCodeModal from './QRCodeModal';
 
-export default function SendScreen({ onStartSend, targetReceiverId, setTargetReceiverId }) {
+export default function SendScreen({ onStartSend, targetReceiverId, setTargetReceiverId, mode, roomCode, generateNewRoomCode, wsConnected, peerConnected }) {
   const [fileList, setFileList] = useState([]);
   const [isDragging, setIsDragging] = useState(false);
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);
@@ -69,10 +69,87 @@ export default function SendScreen({ onStartSend, targetReceiverId, setTargetRec
     setTimeout(() => setPairedSuccess(false), 3000);
   };
 
+  const [copiedRoom, setCopiedRoom] = useState(false);
+  const [copiedLink, setCopiedLink] = useState(false);
+
   const totalBytes = fileList.reduce((acc, f) => acc + f.size, 0);
+
+  const handleCopyRoomCode = () => {
+    if (!roomCode) return;
+    navigator.clipboard.writeText(roomCode);
+    setCopiedRoom(true);
+    setTimeout(() => setCopiedRoom(false), 2000);
+  };
+
+  const handleCopyLink = () => {
+    if (!roomCode) return;
+    const url = `${window.location.origin}?room=${roomCode}`;
+    navigator.clipboard.writeText(url);
+    setCopiedLink(true);
+    setTimeout(() => setCopiedLink(false), 2000);
+  };
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto font-mono">
+      {/* WebSocket Room Code Panel */}
+      {mode === 'WebSocket' && (
+        <div className="bg-gradient-to-r from-cyan-500/10 to-blue-600/10 border border-cyan-500/30 p-5 rounded-xl space-y-3 text-xs">
+          <div className="flex items-center justify-between">
+            <label className="text-cyan-300 font-bold flex items-center gap-2 text-sm">
+              <Globe className="w-4 h-4" />
+              WEBSOCKET TRANSFER MODE — Room Pairing
+            </label>
+            {peerConnected && (
+              <span className="text-emerald-400 font-bold text-xs flex items-center gap-1 animate-pulse">
+                <CheckCircle2 className="w-4 h-4" /> Peer Connected!
+              </span>
+            )}
+          </div>
+
+          <div className="bg-[#0d1322] p-4 rounded-xl border border-[#243252] space-y-3">
+            <div className="flex items-center gap-3">
+              <div className="flex-1">
+                <p className="text-gray-400 text-[10px] uppercase mb-1">Room Code (Share with receiver)</p>
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl font-black tracking-[0.3em] text-cyan-300">
+                    {roomCode || '------'}
+                  </span>
+                  {!roomCode && (
+                    <button
+                      onClick={generateNewRoomCode}
+                      className="text-xs bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 px-3 py-1.5 rounded-lg hover:bg-cyan-500/30 transition-all font-bold"
+                    >
+                      Generate Code
+                    </button>
+                  )}
+                </div>
+              </div>
+              {roomCode && (
+                <div className="flex flex-col gap-2">
+                  <button
+                    onClick={handleCopyRoomCode}
+                    className="flex items-center gap-1.5 bg-[#1a243b] hover:bg-[#243252] text-cyan-300 text-xs px-3 py-2 rounded-lg border border-cyan-500/30 transition-all"
+                  >
+                    {copiedRoom ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                    {copiedRoom ? 'Copied!' : 'Copy Code'}
+                  </button>
+                  <button
+                    onClick={handleCopyLink}
+                    className="flex items-center gap-1.5 bg-[#1a243b] hover:bg-[#243252] text-purple-300 text-xs px-3 py-2 rounded-lg border border-purple-500/30 transition-all"
+                  >
+                    {copiedLink ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Link className="w-3.5 h-3.5" />}
+                    {copiedLink ? 'Copied!' : 'Copy Link'}
+                  </button>
+                </div>
+              )}
+            </div>
+            <p className="text-gray-500 text-[10px]">
+              Share this room code or link with the receiver. They will enter it on their Receiver page to join this transfer session.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Target Receiver ID & QR Scanner Selection Box */}
       <div className="bg-[#131b2e] border border-[#243252] p-5 rounded-xl space-y-3 text-xs">
         <div className="flex items-center justify-between">

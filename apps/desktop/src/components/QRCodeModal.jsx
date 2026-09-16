@@ -118,8 +118,11 @@ export default function QRCodeModal({ isOpen, onClose, mode, receiverId, onPairS
 
       setCameraActive(true);
     } catch (err) {
-      console.warn('HTML5 Camera start error:', err);
-      setCameraError('Camera unavailable or permission denied. Use manual entry or test shortcuts below.');
+      const isPermissionErr = String(err).includes('NotAllowedError') || String(err).includes('Permission');
+      const msg = isPermissionErr
+        ? 'Camera permission dismissed or denied. Click "Retry Camera" or use quick pair shortcuts & manual entry below.'
+        : 'Camera unavailable on this device. Use manual entry or quick pair shortcuts below.';
+      setCameraError(msg);
       setCameraActive(false);
     }
   };
@@ -133,13 +136,17 @@ export default function QRCodeModal({ isOpen, onClose, mode, receiverId, onPairS
             const initialCam = devices[0].id;
             startScanner(initialCam);
           } else {
-            // Fallback to environment/user facing mode
             startScanner({ facingMode: 'environment' });
           }
         })
-        .catch(() => {
-          // Fallback to user facing mode for laptops/webcams
-          startScanner({ facingMode: 'user' });
+        .catch((err) => {
+          const isPermissionErr = String(err).includes('NotAllowedError') || String(err).includes('Permission');
+          if (isPermissionErr) {
+            setCameraError('Camera permission dismissed or denied. Click "Retry Camera" or use manual entry below.');
+            setCameraActive(false);
+          } else {
+            startScanner({ facingMode: 'user' });
+          }
         });
     } else {
       stopScanner();

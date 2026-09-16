@@ -109,6 +109,19 @@ export default function App() {
     setPeerConnected(false);
   }, []);
 
+  // Auto-detect room code from URL parameters (e.g. ?room=ABCDEF)
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const urlRoom = params.get("room");
+      if (urlRoom) {
+        setRoomCode(urlRoom.toUpperCase());
+        setMode("WebSocket");
+        setActiveTab("receiver");
+      }
+    }
+  }, []);
+
   // Clean up on mode change
   useEffect(() => {
     return () => cleanupTransports();
@@ -153,27 +166,14 @@ export default function App() {
         roomId: code,
         role: "sender",
       });
-
-      // In WebSocket mode, receiver is on a different browser/device.
-      // The sender just connects and sends — the receiver side is handled
-      // by ReceiverScreen joining the same room.
-      // For local demo (both in same browser), we still create a receiver transport.
-      receiverTransport = new WebSocketTransport({
-        roomId: code,
-        role: "receiver",
-      });
-
       senderTransportRef.current = senderTransport;
-      receiverTransportRef.current = receiverTransport;
+
+      senderTransport.on('peerJoined', () => setPeerConnected(true));
+      senderTransport.on('peerLeft', () => setPeerConnected(false));
 
       try {
         await senderTransport.connect();
-        await receiverTransport.connect();
         setWsConnected(true);
-
-        // Wait briefly for peer notification
-        await new Promise(resolve => setTimeout(resolve, 300));
-        setPeerConnected(true);
       } catch (err) {
         console.error("WebSocket connection failed:", err);
         alert(`WebSocket connection failed: ${err.message}. Make sure the relay server is running.`);
@@ -186,20 +186,77 @@ export default function App() {
         latencyMs: 0.1,
         lossRate: settings.lossRate,
       });
-      receiverTransport = new SimulationTransport({
+      const receiverTransport = new SimulationTransport({
         latencyMs: 0.1,
         lossRate: settings.lossRate,
       });
       senderTransport.pair(receiverTransport);
       senderTransportRef.current = senderTransport;
       receiverTransportRef.current = receiverTransport;
-    }
 
-    const receiver = new FileReceiver(receiverTransport, {
-      destinationDir: "./downloads",
-      receiverId,
-      autoAccept,
-    });
+      const receiver = new FileReceiver(receiverTransport, {
+        destinationDir: "./downloads",
+        receiverId,
+        autoAccept,
+      });
+      receiverRef.current = receiver;
+
+      receiver.on("transferCompleted", (event) => {
+        if (senderRef.current?.state === 'CANCELLED') return;
+        const info = event.payload || event;
+        const pureChunks =
+          info.chunks || receiverRef.current?.inMemoryChunks || [];
+        const blob = new Blob(pureChunks, {
+          type: fileObj.type || "application/octet-stream",
+        });
+        const downloadUrl = URL.createObjectURL(blob);
+
+        setReceivedFiles((prev) => [
+          {
+            filename: fileObj.name,
+            senderId: myDeviceId,
+            targetReceiverId,
+            sizeText: formatSize(fileObj.size),
+            sha256: info.sha256 || "Verified SHA256",
+            downloadUrl,
+          },
+          ...prev,
+        ]);
+
+        setHistoryTransfers((prev) => [
+          {
+            filename: fileObj.name,
+            size: formatSize(fileObj.size),
+            speed: `${info.averageSpeedMbps || 864} Mbps`,
+            status: "Completed",
+            direction: "SEND",
+          },
+          ...prev,
+        ]);
+
+        setActiveTransfer({
+          filename: fileObj.name,
+          fileSize: fileObj.size,
+          bytesTransferred: fileObj.size,
+          senderId: myDeviceId,
+          targetReceiverId,
+          currentSpeedMbps: info.averageSpeedMbps || "864.00",
+          averageSpeedMbps: info.averageSpeedMbps || "864.00",
+          etaSeconds: 0,
+          packetsSent: Math.ceil(fileObj.size / settings.chunkSize) || 1,
+          packetsRetransmitted: 0,
+          progressPercent: "100.0",
+          state: "COMPLETED",
+          sha256: info.sha256,
+          downloadUrl,
+        });
+
+        setSpeedHistory((prev) => [
+          ...prev.slice(-30),
+          parseFloat(info.averageSpeedMbps || 864),
+        ]);
+      });
+    }
 
     const sender = new FileSender(senderTransport, {
       chunkSize: settings.chunkSize,
@@ -209,111 +266,6 @@ export default function App() {
     });
 
     senderRef.current = sender;
-    receiverRef.current = receiver;
-
-    // SHA256 Hashing Progress for Large GB files
-    sender.on("hashProgress", (event) => {
-      if (sender.state === 'CANCELLED') return;
-      const data = event.payload || event;
-      setActiveTransfer({
-        filename: fileObj.name,
-        fileSize: fileObj.size,
-        senderId: myDeviceId,
-        targetReceiverId,
-        bytesTransferred: 0,
-        bytesHashed: data.bytesHashed,
-        currentSpeedMbps: "Hashing Payload...",
-        averageSpeedMbps: "Preparing SHA-256",
-        etaSeconds: Math.ceil(
-          (fileObj.size - data.bytesHashed) / (50 * 1024 * 1024),
-        ),
-        packetsSent: 0,
-        packetsRetransmitted: 0,
-        progressPercent: data.percent,
-        state: "HASHING",
-      });
-    });
-
-    sender.on("transferProgress", (event) => {
-      if (sender.state === 'CANCELLED') return;
-      const metrics = event.payload || event;
-      setActiveTransfer({
-        filename: fileObj.name,
-        fileSize: fileObj.size,
-        senderId: myDeviceId,
-        targetReceiverId,
-        bytesTransferred: metrics.bytesTransferred,
-        currentSpeedMbps: metrics.currentSpeedMbps,
-        averageSpeedMbps: metrics.averageSpeedMbps,
-        etaSeconds: metrics.etaSeconds,
-        packetsSent: metrics.packetsSent,
-        packetsRetransmitted: metrics.packetsRetransmitted,
-        progressPercent: metrics.progressPercent,
-        state: metrics.state,
-      });
-
-      setSpeedHistory((prev) => [
-        ...prev.slice(-30),
-        parseFloat(metrics.currentSpeedMbps || 850),
-      ]);
-    });
-
-    receiver.on("transferCompleted", (event) => {
-      if (sender.state === 'CANCELLED') return;
-      const info = event.payload || event;
-      const pureChunks =
-        info.chunks || receiverRef.current?.inMemoryChunks || [];
-      const blob = new Blob(pureChunks, {
-        type: fileObj.type || "application/octet-stream",
-      });
-      const downloadUrl = URL.createObjectURL(blob);
-
-      setReceivedFiles((prev) => [
-        {
-          filename: fileObj.name,
-          senderId: myDeviceId,
-          targetReceiverId,
-          sizeText: formatSize(fileObj.size),
-          sha256: info.sha256 || "Verified SHA256",
-          downloadUrl,
-        },
-        ...prev,
-      ]);
-
-      setHistoryTransfers((prev) => [
-        {
-          filename: fileObj.name,
-          size: formatSize(fileObj.size),
-          speed: `${info.averageSpeedMbps || 864} Mbps`,
-          status: "Completed",
-          direction: "SEND",
-        },
-        ...prev,
-      ]);
-
-      // Keep completion state active so user gets 100% complete confirmation banner!
-      setActiveTransfer({
-        filename: fileObj.name,
-        fileSize: fileObj.size,
-        bytesTransferred: fileObj.size,
-        senderId: myDeviceId,
-        targetReceiverId,
-        currentSpeedMbps: info.averageSpeedMbps || "864.00",
-        averageSpeedMbps: info.averageSpeedMbps || "864.00",
-        etaSeconds: 0,
-        packetsSent: Math.ceil(fileObj.size / settings.chunkSize) || 1,
-        packetsRetransmitted: 0,
-        progressPercent: "100.0",
-        state: "COMPLETED",
-        sha256: info.sha256,
-        downloadUrl,
-      });
-
-      setSpeedHistory((prev) => [
-        ...prev.slice(-30),
-        parseFloat(info.averageSpeedMbps || 864),
-      ]);
-    });
 
     sender.on("transferFailed", (event) => {
       const err = event.payload || event;

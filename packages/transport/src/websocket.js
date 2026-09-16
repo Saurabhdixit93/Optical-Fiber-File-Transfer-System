@@ -38,9 +38,9 @@ export class WebSocketTransport extends BaseTransport {
   static getDefaultWsUrl() {
     if (typeof window !== 'undefined' && window.location) {
       const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      return `${protocol}//${window.location.host}`;
+      return `${protocol}//${window.location.host}/ws`;
     }
-    return 'ws://localhost:3000';
+    return 'ws://localhost:3000/ws';
   }
 
   async connect() {
